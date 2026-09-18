@@ -3,8 +3,19 @@
 import { deleteProduct } from "@/app/actions";
 import React, { useState } from "react";
 import { toast } from "sonner";
-import {Card,CardContent,CardFooter,CardHeader,} from "@/components/ui/card";
-import { TrendingDown, ChevronUp, ChevronDown, ExternalLink, Trash2 } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
+import {
+  TrendingDown,
+  ChevronUp,
+  ChevronDown,
+  ExternalLink,
+  Trash2,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -53,60 +64,57 @@ const ProductCard = ({ product }) => {
                 {product.currency} {product.current_price}
               </span>
 
-              <Badge variant="secondary" className="gap-1">
-                <TrendingDown className="w-3 h-3" />
-                Tracking
-              </Badge>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-700">
+                <TrendingDown className="h-4 w-4 shrink-0" />
+                <span>Tracking</span>
+              </span>
             </div>
           </div>
         </div>
       </CardHeader>
       <CardContent>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex items-center gap-3 mt-5 flex-wrap">
+          {/* Show Chart Button */}
           <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setShowChart(!showChart)}
-          className="gap-1"
+            variant="outline"
+            className="flex items-center gap-2 border-gray-300 hover:bg-gray-100 px-4 py-2"
+            onClick={() => setShowChart(!showChart)}
           >
-            {showChart ? (
-              <>
-              <ChevronUp className="w-4 h-4" /> 
-              Hide Chart
-              </>
-            ) : (
-              <>
-              <ChevronDown className="w-4 h-4" />
-              Show Chart
-              </>
-            )}
+            <ChevronDown
+              className={`w-4 h-4 transition-transform ${
+                showChart ? "rotate-180" : ""
+              }`}
+            />
+            <span>{showChart ? "Hide Chart" : "Show Chart"}</span>
           </Button>
 
-          <Button variant="outline" size="sm" asChild className="gap-1">
-            <Link href={product.url} target="_blank" rel="noopener noreferrer">
-             <ExternalLink className="w-4 h-4" />
-              View Product
-            </Link>
-          </Button>
-
-          <Button
-          variant="ghost"
-          size="sm"
-          onClick={handleDelete}
-          disabled={deleting}
-          className="text-red-600 hover:text-red-700 hover:bg-red-50 gap-1"
+          {/* View Product Button */}
+          <a
+            href={product.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-800 transition hover:bg-gray-100"
           >
-            <Trash2 className="w-4 h-4" />
-            Remove
-          </Button> 
+            <ExternalLink className="w-4 h-4 shrink-0" />
+            <span>View Product</span>
+          </a>
+
+          {/* Remove Button */}
+          <Button
+            variant="outline"
+            className="inline-flex items-center gap-2 border-red-200 px-4 py-2 text-red-600 hover:bg-red-50 hover:text-red-700"
+            onClick={() => handleDelete(product.id)}
+          >
+            <Trash2 className="w-4 h-4 shrink-0" />
+            <span>Remove</span>
+          </Button>
         </div>
       </CardContent>
       {showChart && (
         <CardFooter className="pt-0">
-        <PriceChart productId={product.id} />  
-      </CardFooter>
+          <PriceChart productId={product.id} />
+        </CardFooter>
       )}
-      
     </Card>
   );
 };

@@ -48,14 +48,14 @@ const AddProductForm = ({ user }) => {
             type="url"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
-            placeholder="Paste product URL (Amazon, Walmart, etc.)"
-            className="h-12 text-base"
+            placeholder="Paste product URL (Amazon, Flipkart, etc.)"
+            className="h-14 w-full rounded-xl border-gray-300 px-5 text-base shadow-sm focus:border-orange-400 focus:ring-orange-200"
             required
             disabled={loading}
           />
 
           <Button
-            className="bg-orange-500 hover:bg-orange-600 h-10 sm:h-12 px-8"
+            className="h-14 rounded-xl bg-orange-500 px-8 text-base font-semibold text-white shadow-md transition-all hover:bg-orange-600 hover:shadow-lg"
             type="submit"
             disabled={loading}
             size={"lg"}
