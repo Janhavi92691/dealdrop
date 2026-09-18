@@ -113,5 +113,4 @@ export async function POST() {
     }
 }
 
-// curl -X POST https://deal-drop.vercel.app/api/cron/check-prices \
-// -H "Authorization: Bearer 2869b8778db21731847d9f69ff357d4907374dde0a91b33f7f398d52e1668ca9"
+// curl -X POST https://yourdealdrop.vercel.app/api/cron/check-prices \-H "Authorization: Bearer YOUR_CRON_SECRET"
