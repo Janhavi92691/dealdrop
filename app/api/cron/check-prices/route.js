@@ -3,10 +3,24 @@ import { createClient } from "@supabase/supabase-js";
 import { scrapeProduct } from "@/lib/firecrawl";
 import { sendPriceDropAlert } from "@/lib/email";
 
+function parsePrice(val) {
+    if (typeof val === "number") return isNaN(val) ? null : val;
+    if (!val) return null;
+    const str = String(val).replace(/[^0-9.]/g, "");
+    if (!str) return null;
+    const parts = str.split(".");
+    if (parts.length > 2) {
+        const parsed = parseFloat(parts[0] + "." + parts.slice(1).join(""));
+        return isNaN(parsed) ? null : parsed;
+    }
+    const parsed = parseFloat(str);
+    return isNaN(parsed) ? null : parsed;
+}
+
 export async function GET() {
     return NextResponse.json({
         message: "Price check endpoint is working. Use POST to trigger.",
-     });
+    });
 }
 
 export async function POST(request) {
@@ -83,19 +97,17 @@ export async function POST(request) {
                     continue;
                 }
 
-                const newPrice = parseFloat(productData.currentPrice);
+                const newPrice = parsePrice(productData.currentPrice);
                 // Note: The Supabase table column is 'current_price' (snake_case)
                 const rawOldPrice = product.current_price !== undefined && product.current_price !== null
                     ? product.current_price
                     : product.currentPrice;
-                const oldPrice = rawOldPrice !== undefined && rawOldPrice !== null
-                    ? parseFloat(rawOldPrice)
-                    : null;
+                const oldPrice = parsePrice(rawOldPrice);
 
                 productAudit.oldPrice = oldPrice;
                 productAudit.newPrice = newPrice;
 
-                if (isNaN(newPrice)) {
+                if (newPrice === null || isNaN(newPrice)) {
                     console.warn(`[Cron] Product ${product.id}: Scraped price is invalid:`, productData.currentPrice);
                     results.failed++;
                     productAudit.status = "invalid_new_price";
@@ -237,10 +249,10 @@ export async function POST(request) {
 
                 results.details.push(productAudit);
             } catch (error) {
-                console.error(`[Cron] Error processing product ${product.id}:`, error);
+                console.error(`[Cron] Error processing product ${product.id}:`, error.message || error);
                 results.failed++;
                 productAudit.status = "error";
-                productAudit.error = error.message || "Unknown error";
+                productAudit.error = error.message || String(error);
                 results.details.push(productAudit);
             }
         }
@@ -251,7 +263,7 @@ export async function POST(request) {
             results,
         });
     } catch (error) {
-        console.error("Cron job error:", error);
+        console.error("Cron job error:", error.message || error);
         return NextResponse.json(
             { error: error.message || "Internal server error" },
             { status: 500 }
